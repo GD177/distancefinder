@@ -7,8 +7,8 @@ import com.geographical.distancefinder.model.request.GetDistanceBetweenPostCodes
 import com.geographical.distancefinder.model.response.GetDistanceBetweenPostCodesResponse;
 import com.geographical.distancefinder.util.FileReader;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -25,7 +25,7 @@ public class DistanceFinderBetweenPostCodesServiceImpl implements DistanceFinder
 
     private final static double EARTH_RADIUS = 6371; // radius in kilometers
     private final static String UNIT = "km";
-    private static final Logger log = LoggerFactory.getLogger(DistanceFinderBetweenPostCodesServiceImpl.class);
+    private static final Logger log = LogManager.getLogger(DistanceFinderBetweenPostCodesServiceImpl.class);
     private Map<String, LocationInfo> postCodeMap;
     private static final String fileName = "ukpostcodes.csv";
 
@@ -39,12 +39,11 @@ public class DistanceFinderBetweenPostCodesServiceImpl implements DistanceFinder
     }
 
     @Override
-    public GetDistanceBetweenPostCodesResponse getDistance
-            (final GetDistanceBetweenPostCodesRequest distanceBetweenPostCodesRequest) throws Exception {
+    public GetDistanceBetweenPostCodesResponse getDistance(
+            final GetDistanceBetweenPostCodesRequest distanceBetweenPostCodesRequest) throws Exception {
+
             validateRequest(distanceBetweenPostCodesRequest);
-
             File file = readFile();
-
             createPostCodeMapFromFile(file);
 
             checkIfPostCodesExists(distanceBetweenPostCodesRequest);
@@ -60,16 +59,20 @@ public class DistanceFinderBetweenPostCodesServiceImpl implements DistanceFinder
 
             log.info("Distance calculation result: {}", distance);
 
-            GetDistanceBetweenPostCodesResponse getDistanceBetweenPostCodesResponse = new GetDistanceBetweenPostCodesResponse();
-            getDistanceBetweenPostCodesResponse.setDistance(distance);
-            getDistanceBetweenPostCodesResponse.setLocationInfo(List.of(info1, info2));
-            getDistanceBetweenPostCodesResponse.setUnit(UNIT);
-
-            return getDistanceBetweenPostCodesResponse;
+            return responseBuilder(info1, info2, distance);
     }
 
-    private void validateRequest(final GetDistanceBetweenPostCodesRequest distanceBetweenPostCodesRequest) throws InputValidationException {
+    @NotNull
+    private static GetDistanceBetweenPostCodesResponse responseBuilder(LocationInfo info1, LocationInfo info2, double distance) {
+        GetDistanceBetweenPostCodesResponse getDistanceBetweenPostCodesResponse = new GetDistanceBetweenPostCodesResponse();
+        getDistanceBetweenPostCodesResponse.setDistance(distance);
+        getDistanceBetweenPostCodesResponse.setLocationInfo(List.of(info1, info2));
+        getDistanceBetweenPostCodesResponse.setUnit(UNIT);
+        return getDistanceBetweenPostCodesResponse;
+    }
 
+    private void validateRequest(final GetDistanceBetweenPostCodesRequest distanceBetweenPostCodesRequest)
+            throws InputValidationException {
         if(!Objects.nonNull(distanceBetweenPostCodesRequest) || distanceBetweenPostCodesRequest.getPostCode1() == null
                 || distanceBetweenPostCodesRequest.getPostCode1().isEmpty() ||
                 distanceBetweenPostCodesRequest.getPostCode1().isBlank() ||
@@ -80,11 +83,14 @@ public class DistanceFinderBetweenPostCodesServiceImpl implements DistanceFinder
         }
     }
 
-    private void checkIfPostCodesExists(final GetDistanceBetweenPostCodesRequest distanceBetweenPostCodesRequest) throws NonRetryableException
+    private void checkIfPostCodesExists(final GetDistanceBetweenPostCodesRequest distanceBetweenPostCodesRequest)
+            throws NonRetryableException
     {
         if(!postCodeMap.containsKey(distanceBetweenPostCodesRequest.getPostCode1()) ||
                 !postCodeMap.containsKey(distanceBetweenPostCodesRequest.getPostCode2()))
+        {
             throw new NonRetryableException("requested postcodes doesn't exists");
+        }
     }
 
     private void createPostCodeMapFromFile(@NotNull File file) throws IOException {
@@ -109,7 +115,8 @@ public class DistanceFinderBetweenPostCodesServiceImpl implements DistanceFinder
                         }
                     });
         } catch (IOException e) {
-            log.info("Error while creating postcode map: {} | StackTrace: {} ", e.getMessage(), Arrays.toString(e.getStackTrace()));
+            log.error("Error while creating postcode map: {} | StackTrace: {} ", e.getMessage(),
+                    Arrays.toString(e.getStackTrace()));
             throw e;
         }
     }

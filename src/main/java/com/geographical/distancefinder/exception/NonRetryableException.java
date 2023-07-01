@@ -1,7 +1,7 @@
 package com.geographical.distancefinder.exception;
 
 /**
- * Non retryable exception
+ * NonRetryable exception
  */
 public class NonRetryableException extends Exception {
     public NonRetryableException(String message){

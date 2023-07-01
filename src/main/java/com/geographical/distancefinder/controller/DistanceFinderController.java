@@ -1,7 +1,6 @@
 package com.geographical.distancefinder.controller;
 
 import com.geographical.distancefinder.exception.InputValidationException;
-import com.geographical.distancefinder.exception.NonRetryableException;
 import com.geographical.distancefinder.model.request.GetDistanceBetweenPostCodesRequest;
 import com.geographical.distancefinder.model.response.GetDistanceBetweenPostCodesResponse;
 import com.geographical.distancefinder.service.DistanceFinderService;
@@ -24,18 +23,19 @@ public class DistanceFinderController {
 
     /**
      * Calculates distance between two postal codes
-     * @param distanceBetweenPostCodesRequest :
+     * @param distanceBetweenPostCodesRequest (postCode1, postCode2)
      * @return GetDistanceBetweenPostCodesResponse
      */
     @GetMapping("/distance")
-    public ResponseEntity<GetDistanceBetweenPostCodesResponse> getDistance(@RequestBody final GetDistanceBetweenPostCodesRequest distanceBetweenPostCodesRequest)
+    public ResponseEntity<GetDistanceBetweenPostCodesResponse> getDistance(
+            final GetDistanceBetweenPostCodesRequest distanceBetweenPostCodesRequest)
     {
         try {
-            final GetDistanceBetweenPostCodesResponse dist = distanceFinderService.getDistance(distanceBetweenPostCodesRequest);
+            final GetDistanceBetweenPostCodesResponse dist = distanceFinderService.
+                    getDistance(distanceBetweenPostCodesRequest);
 
             return ResponseEntity.ok(dist);
-
-        } catch (InputValidationException | NonRetryableException ex){
+        } catch (InputValidationException ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

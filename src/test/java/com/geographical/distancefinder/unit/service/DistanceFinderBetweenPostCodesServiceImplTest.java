@@ -1,10 +1,11 @@
-package com.geographical.distancefinder.service;
+package com.geographical.distancefinder.unit.service;
 
 import com.geographical.distancefinder.exception.InputValidationException;
 import com.geographical.distancefinder.exception.NonRetryableException;
 import com.geographical.distancefinder.model.LocationInfo;
 import com.geographical.distancefinder.model.request.GetDistanceBetweenPostCodesRequest;
 import com.geographical.distancefinder.model.response.GetDistanceBetweenPostCodesResponse;
+import com.geographical.distancefinder.service.DistanceFinderBetweenPostCodesServiceImpl;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -21,7 +22,7 @@ public class DistanceFinderBetweenPostCodesServiceImplTest {
     private DistanceFinderBetweenPostCodesServiceImpl distanceFinderBetweenPostCodesService;
 
     @Test
-    public void getDistanceSuccessCase() throws Exception {
+    public void testGetDistanceSuccessCase() throws Exception {
         GetDistanceBetweenPostCodesRequest request = new GetDistanceBetweenPostCodesRequest();
         request.setPostCode1("AB10 1XG");
         request.setPostCode2("AB11 5QN");
@@ -39,13 +40,13 @@ public class DistanceFinderBetweenPostCodesServiceImplTest {
     }
 
     @Test(expected = InputValidationException.class)
-    public void getDistanceValidationFailureCase() throws Exception {
+    public void testGetDistanceValidationFailureCase() throws Exception {
         GetDistanceBetweenPostCodesRequest request = new GetDistanceBetweenPostCodesRequest();
         GetDistanceBetweenPostCodesResponse actualResponse = distanceFinderBetweenPostCodesService.getDistance(request);
     }
 
     @Test(expected = NonRetryableException.class)
-    public void getDistanceInvalidPostCodeFailureCase() throws Exception
+    public void testGetDistanceInvalidPostCodeFailureCase() throws Exception
     {
         GetDistanceBetweenPostCodesRequest request = new GetDistanceBetweenPostCodesRequest();
         request.setPostCode1("AB10 1XG");

@@ -1,6 +1,8 @@
-package com.geographical.distancefinder.controller;
+package com.geographical.distancefinder.unit.controller;
 
+import com.geographical.distancefinder.controller.DistanceFinderController;
 import com.geographical.distancefinder.exception.InputValidationException;
+import com.geographical.distancefinder.exception.NonRetryableException;
 import com.geographical.distancefinder.model.LocationInfo;
 import com.geographical.distancefinder.model.request.GetDistanceBetweenPostCodesRequest;
 import com.geographical.distancefinder.model.response.GetDistanceBetweenPostCodesResponse;
@@ -27,7 +29,7 @@ public class DistanceFinderControllerTest {
     @Mock private DistanceFinderService distanceFinderService;
 
     @Test
-    public void getDistanceSuccess() throws Exception {
+    public void testGetDistanceSuccess() throws Exception {
         GetDistanceBetweenPostCodesRequest request = new GetDistanceBetweenPostCodesRequest();
         request.setPostCode1("AB10 1XG");
         request.setPostCode2("AB11 5QN");
@@ -49,7 +51,7 @@ public class DistanceFinderControllerTest {
     }
 
     @Test
-    public void getDistanceIOException() throws Exception {
+    public void testGetDistanceIOException() throws Exception {
         GetDistanceBetweenPostCodesRequest request = new GetDistanceBetweenPostCodesRequest();
         request.setPostCode1("AB10 7JB");
         request.setPostCode2("AB11 5QN");
@@ -62,7 +64,7 @@ public class DistanceFinderControllerTest {
     }
 
     @Test
-    public void getDistanceInputValidationException() throws Exception {
+    public void testGetDistanceInputValidationException() throws Exception {
         GetDistanceBetweenPostCodesRequest request = new GetDistanceBetweenPostCodesRequest();
 
         ResponseEntity<GetDistanceBetweenPostCodesResponse> expectedResponse = ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -73,14 +75,14 @@ public class DistanceFinderControllerTest {
     }
 
     @Test
-    public void getDistanceInvalidPostCodeException() throws Exception {
+    public void testGetDistanceInvalidPostCodeException() throws Exception {
         GetDistanceBetweenPostCodesRequest request = new GetDistanceBetweenPostCodesRequest();
         request.setPostCode1("AB10 1XG");
         request.setPostCode2("AB11");
 
-        ResponseEntity<GetDistanceBetweenPostCodesResponse> expectedResponse = ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        ResponseEntity<GetDistanceBetweenPostCodesResponse> expectedResponse = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 
-        Mockito.when(distanceFinderService.getDistance(any())).thenThrow(new InputValidationException("test exception"));
+        Mockito.when(distanceFinderService.getDistance(any())).thenThrow(new NonRetryableException("test exception"));
         ResponseEntity<GetDistanceBetweenPostCodesResponse> actualResponse = distanceFinderController.getDistance(request);
         Assert.assertEquals(expectedResponse, actualResponse);
     }

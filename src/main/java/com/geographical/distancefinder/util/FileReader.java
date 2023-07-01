@@ -14,8 +14,8 @@ public final class FileReader {
     /**
      * Reads file from S3 or from different storage
      * Also an option that can be used if we don't want to use local file
-     * @param filename :
-     * @param location :
+     * @param filename'
+     * @param location'
      * @return File
      */
     public static File readFileFromS3(String filename, String location) {
@@ -25,10 +25,10 @@ public final class FileReader {
 
     /**
      * Reads file from local storage
-     * @param filename :
-     * @param location :
+     * @param filename'
+     * @param location'
      * @return File
-     * @throws IOException :
+     * @throws IOException'
      */
     public static File readFileFromLocal(String filename, String location) throws IOException {
         File file = ResourceUtils.getFile("classpath:" + filename);
